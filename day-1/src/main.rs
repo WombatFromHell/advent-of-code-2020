@@ -14,37 +14,45 @@ fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
     Ok(lines)
 }
 
-fn part_a(_vec: Vec<i32>) -> Option<i32> {
+fn sum_two(_vec: Vec<i32>) -> Option<i32> {
+    let length = _vec.len();
     let mut attempts = 0;
-    for (_i, _x) in _vec.iter().enumerate() {
-        for (_j, _y) in _vec.iter().enumerate() {
+    for i in 0..length-2 {
+        for j in 0..i+1 {
+            let x = _vec[i];
+            let y = _vec[j];
             attempts += 1;
-            if _x + _y == 2020 {
-                let product = _x * _y;
-                println!("part A: found {} after {} attempts", product, attempts);
+            if x + y == 2020 {
+                let product = x * y;
+                println!("found {} after {} attempts", product, attempts);
                 return Some(product);
             }
         }
     }
-    println!("found no solution for part A!");
+    println!("found no solution for two-sum!");
     None
 }
 
-fn part_b(_vec: Vec<i32>) -> Option<i32> {
+fn sum_three(_vec: Vec<i32>) -> Option<i32> {
+    let length = _vec.len();
     let mut attempts = 0;
-    for (_i, _x) in _vec.iter().enumerate() {
-        for (_j, _y) in _vec.iter().enumerate() {
-            for (_k, _z) in _vec.iter().enumerate() {
+
+    for i in 0..length-2 {
+        for j in 0..i+1 {
+            for k in 0..length {
+                let x = _vec[i];
+                let y = _vec[j];
+                let z = _vec[k];
                 attempts += 1;
-                if _x + _y + _z == 2020 {
-                    let product = _x * _y * _z;
-                    println!("part B: found {} after {} attempts", product, attempts);
+                if x + y + z == 2020 {
+                    let product = x * y * z;
+                    println!("found {} after {} attempts", product, attempts);
                     return Some(product);
                 }
             }
         }
     }
-    println!("found no solution for part B!");
+    println!("found no solution for three-sum!");
     None
 }
 
@@ -53,11 +61,12 @@ fn main() -> Result<(), Error> {
     if let Some(arg_path) = args.as_slice().get(1) {
         let filepath = Path::new(&arg_path).to_path_buf();
 
-        let _vec = read_to_vec(filepath)?;
+        let mut _vec = read_to_vec(filepath)?;
+        _vec.sort();
         let _vec2 = _vec.clone();
 
-        part_a(_vec);
-        part_b(_vec2);
+        sum_two(_vec);
+        sum_three(_vec2);
     };
 
     Ok(())
