@@ -16,54 +16,50 @@ async fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
     Ok(contents)
 }
 
-async fn part_a(arg_path: &String) -> Result<Vec<i32>, Error> {
-    let filepath = Path::new(&arg_path).to_path_buf();
-    let _a = read_to_vec(filepath).await?;
-    let _b = &_a.clone();
-    let mut result = 0;
-    // part A
-    for (_i, _x) in _a.iter().enumerate() {
-        for (_j, _y) in _b.iter().enumerate() {
+fn part_a(_vec: Vec<i32>) -> Option<i32> {
+    for (_i, _x) in _vec.iter().enumerate() {
+        for (_j, _y) in _vec.iter().enumerate() {
             if _x + _y == 2020 {
-                result = _x * _y;
-                break;
+                return Some(_x * _y);
             }
-        }
-        if result > 0 {
-            break;
         }
     }
-    println!("part A: {}", result);
-    Ok(_a)
+    return None;
 }
 
-fn part_b(report: Vec<i32>) {
-    let mut result = 0;
-    // part B
-    for (_i, _x) in report.iter().enumerate() {
-        if result > 0 {
-            break;
-        }
-        for (_j, _y) in report.iter().enumerate() {
-            if result > 0 {
-                break;
-            }
-            for (_k, _z) in report.iter().enumerate() {
+fn part_b(_vec: Vec<i32>) -> Option<i32> {
+    for (_i, _x) in _vec.iter().enumerate() {
+        for (_j, _y) in _vec.iter().enumerate() {
+            for (_k, _z) in _vec.iter().enumerate() {
                 if _x + _y + _z == 2020 {
-                    result = _x * _y * _z;
-                    break;
+                    return Some(_x * _y * _z);
                 }
             }
         }
     }
-    println!("part B: {}", result);
+    return None;
 }
 
 #[async_std::main]
 async fn main() -> Result<(), Error> {
     let args: Vec<String> = env::args().collect();
-    let firstmatch = args.as_slice().get(1).unwrap();
-    let result_a = part_a(&firstmatch).await?;
-    part_b(result_a);
+    let arg_path = args.as_slice().get(1).unwrap();
+    let filepath = Path::new(&arg_path).to_path_buf();
+
+    let _vec = read_to_vec(filepath).await?;
+    let _vec2 = _vec.clone();
+
+    if let Some(a) = part_a(_vec) {
+        println!("solved for A: {}", a);
+    } else {
+        eprintln!("found no solution for part A!");
+    };
+
+    if let Some(b) = part_b(_vec2) {
+        println!("solved for B: {}", b);
+    } else {
+        eprintln!("found no solution for part B!");
+    };
+
     Ok(())
 }
