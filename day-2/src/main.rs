@@ -1,8 +1,9 @@
 use text_io::scan;
-use std::env;
-use async_std::{io::Error, path::PathBuf, io::BufReader};
-use async_std::{fs::File, path::Path};
-use async_std::prelude::*;
+use std::{env, fs, path, io};
+use fs::File;
+use io::{BufReader, Error};
+use path::{Path, PathBuf};
+use std::io::prelude::*;
 
 #[derive(Clone, Debug)]
 struct ParsedPasswd {
@@ -13,17 +14,16 @@ struct ParsedPasswd {
     occurrences: usize,
 }
 
-async fn read_to_vec(path: PathBuf) -> Result<Vec<String>, Error> {
-    let file = File::open(&path).await?;
-    let filebuf = BufReader::new(file);
-    let mut lines = filebuf.lines();
-    let mut contents: Vec<String> = Vec::new();
-    while let Some(line) = lines.next().await {
-        contents.push(line.unwrap());
-    }
-    Ok(contents)
+fn read_to_vec(path: PathBuf) -> Result<Vec<String>, Error> {
+    let file = File::open(path)?;
+    let buf = BufReader::new(file);
+    let lines = buf.lines()
+        .map(|l| l.expect("Could not parse line!"))
+        .collect();
+    Ok(lines)
 }
 
+#[allow(unused_assignments)]
 fn parse_line(input: String) -> ParsedPasswd {
     let mut min = 0;
     let mut max = 0;
@@ -40,7 +40,6 @@ fn parse_line(input: String) -> ParsedPasswd {
     }
 }
 
-#[allow(unused_assignments)]
 fn part_a (_vec: Vec<String>) -> i32 {
     let mut valid = 0;
     for l in _vec {
@@ -75,13 +74,12 @@ fn part_b (_vec: Vec<String>) -> i32 {
     validated
 }
 
-#[async_std::main]
-async fn main() -> Result<(), Error> {
+fn main() -> Result<(), Error> {
     let args: Vec<String> = env::args().collect();
     let arg_path = args.as_slice().get(1).unwrap();
     let filepath = Path::new(&arg_path).to_path_buf();
 
-    let _vec = read_to_vec(filepath).await?;
+    let _vec = read_to_vec(filepath)?;
     let _vec2 = _vec.clone();
     let _vec_len = _vec.len();
     let results_a = part_a(_vec);

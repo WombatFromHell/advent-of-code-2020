@@ -1,7 +1,8 @@
-use std::env;
-use async_std::{io::Error, path::PathBuf, io::BufReader};
-use async_std::{fs::File, path::Path};
-use async_std::prelude::*;
+use std::{env, fs, path, io};
+use fs::File;
+use io::{BufReader, Error};
+use path::{Path, PathBuf};
+use std::io::prelude::*;
 
 #[derive(Debug)]
 struct SumTwo {
@@ -19,17 +20,14 @@ struct SumThree {
     product: i32,
 }
 
-async fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
-    let file = File::open(&path).await?;
-    let filebuf = BufReader::new(file);
-    let mut lines = filebuf.lines();
-    let mut contents: Vec<i32> = Vec::new();
-    while let Some(line) = lines.next().await {
-        let val = line?;
-        let parsed = val.parse::<i32>();
-        contents.push(parsed.unwrap());
-    }
-    Ok(contents)
+fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
+    let file = File::open(path)?;
+    let buf = BufReader::new(file);
+    let lines = buf.lines()
+        .map(|l| l.expect("Could not parse line!"))
+        .map(|l| l.parse::<i32>().unwrap())
+        .collect();
+    Ok(lines)
 }
 
 fn sum_two(_vec: Vec<i32>) -> Option<SumTwo> {
@@ -54,7 +52,6 @@ fn sum_two(_vec: Vec<i32>) -> Option<SumTwo> {
 }
 
 fn sum_three(_vec: Vec<i32>) -> Option<SumThree> {
-    //let hashmap = build_hashmap(_vec);
     let length = _vec.len();
     let mut attempts = 0;
 
@@ -79,13 +76,12 @@ fn sum_three(_vec: Vec<i32>) -> Option<SumThree> {
     None
 }
 
-#[async_std::main]
-async fn main() -> Result<(), Error> {
+fn main() -> Result<(), Error> {
     let args: Vec<String> = env::args().collect();
     let arg_path = args.as_slice().get(1).unwrap();
     let filepath = Path::new(&arg_path).to_path_buf();
 
-    let mut _vec = read_to_vec(filepath).await?;
+    let mut _vec = read_to_vec(filepath)?;
     _vec.sort();
     let _vec2 = _vec.clone();
 
