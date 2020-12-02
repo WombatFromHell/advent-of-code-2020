@@ -4,22 +4,6 @@ use io::{BufReader, Error};
 use path::{Path, PathBuf};
 use std::io::prelude::*;
 
-#[derive(Debug)]
-struct SumTwo {
-    x: i32,
-    y: i32,
-    sum: i32,
-    product: i32,
-}
-#[derive(Debug)]
-struct SumThree {
-    x: i32,
-    y: i32,
-    z: i32,
-    sum: i32,
-    product: i32,
-}
-
 fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
     let file = File::open(path)?;
     let buf = BufReader::new(file);
@@ -30,20 +14,18 @@ fn read_to_vec(path: PathBuf) -> Result<Vec<i32>, Error> {
     Ok(lines)
 }
 
-fn sum_two(_vec: Vec<i32>) -> Option<SumTwo> {
+fn sum_two(_vec: Vec<i32>) -> Option<i32> {
     let length = _vec.len();
     let mut attempts = 0;
     for i in 0..length-2 {
         for j in 0..i+1 {
             let x = _vec[i];
             let y = _vec[j];
-            let sum = x + y;
             attempts += 1;
-            if sum == 2020 {
+            if x + y == 2020 {
                 let product = x * y;
-                let result = SumTwo { x, y, sum, product };
-                println!("{:?} after {} attempts", result, attempts);
-                return Some(result);
+                println!("found {} after {} attempts", product, attempts);
+                return Some(product);
             }
         }
     }
@@ -51,7 +33,7 @@ fn sum_two(_vec: Vec<i32>) -> Option<SumTwo> {
     None
 }
 
-fn sum_three(_vec: Vec<i32>) -> Option<SumThree> {
+fn sum_three(_vec: Vec<i32>) -> Option<i32> {
     let length = _vec.len();
     let mut attempts = 0;
 
@@ -61,13 +43,11 @@ fn sum_three(_vec: Vec<i32>) -> Option<SumThree> {
                 let x = _vec[i];
                 let y = _vec[j];
                 let z = _vec[k];
-                let sum = x + y + z;
                 attempts += 1;
-                if sum == 2020 {
+                if x + y + z == 2020 {
                     let product = x * y * z;
-                    let result = SumThree { x, y, z, sum, product };
-                    println!("{:?} after {} attempts", result, attempts);
-                    return Some(result);
+                    println!("found {} after {} attempts", product, attempts);
+                    return Some(product);
                 }
             }
         }
@@ -78,15 +58,16 @@ fn sum_three(_vec: Vec<i32>) -> Option<SumThree> {
 
 fn main() -> Result<(), Error> {
     let args: Vec<String> = env::args().collect();
-    let arg_path = args.as_slice().get(1).unwrap();
-    let filepath = Path::new(&arg_path).to_path_buf();
+    if let Some(arg_path) = args.as_slice().get(1) {
+        let filepath = Path::new(&arg_path).to_path_buf();
 
-    let mut _vec = read_to_vec(filepath)?;
-    _vec.sort();
-    let _vec2 = _vec.clone();
+        let mut _vec = read_to_vec(filepath)?;
+        _vec.sort();
+        let _vec2 = _vec.clone();
 
-    sum_two(_vec);
-    sum_three(_vec2);
+        sum_two(_vec);
+        sum_three(_vec2);
+    };
 
     Ok(())
 }

@@ -1,5 +1,5 @@
 use text_io::scan;
-use std::{env, fs, path, io};
+use std::{str, env, fs, path, io};
 use fs::File;
 use io::{BufReader, Error};
 use path::{Path, PathBuf};
@@ -64,35 +64,39 @@ fn part_b (_vec: Vec<String>) -> i32 {
         let idx1 = parsed.max-1;
         let pwd = parsed.passwd;
         let _asb = pwd.as_bytes();
-        let _first_char = std::str::from_utf8(&_asb[idx0..idx0+1]).unwrap();
-        let _sec_char = std::str::from_utf8(&_asb[idx1..idx1+1]).unwrap();
-
-        if _first_char == &ltr && _sec_char != &ltr || _first_char != &ltr && _sec_char == &ltr{
-            validated += 1;
-        }
+        if let Ok(_first_char) = str::from_utf8(&_asb[idx0..idx0+1]) {
+            if let Ok(_sec_char) = str::from_utf8(&_asb[idx1..idx1+1]) {
+                if _first_char == &ltr && _sec_char != &ltr || _first_char != &ltr && _sec_char == &ltr {
+                    validated += 1;
+                }
+            };
+        };
     }
     validated
 }
 
 fn main() -> Result<(), Error> {
     let args: Vec<String> = env::args().collect();
-    let arg_path = args.as_slice().get(1).unwrap();
-    let filepath = Path::new(&arg_path).to_path_buf();
+    if let Some(arg_path) = args.as_slice().get(1) {
+        let filepath = Path::new(&arg_path).to_path_buf();
 
-    let _vec = read_to_vec(filepath)?;
-    let _vec2 = _vec.clone();
-    let _vec_len = _vec.len();
-    let results_a = part_a(_vec);
-    if results_a > 0 {
-        println!("part A found {} valid passwords out of {}", results_a, _vec_len);
-    } else {
-        println!("part A found no valid passwords!");
-    }
-    let results_b = part_b(_vec2);
-    if results_b > 0 {
-        println!("part B found {} valid passwords out of {}", results_b, _vec_len);
-    } else {
-        println!("part B found no valid passwords!");
+        let _vec = read_to_vec(filepath)?;
+        let _vec2 = _vec.clone();
+        let _vec_len = _vec.len();
+
+        let results_a = part_a(_vec);
+        if results_a > 0 {
+            println!("part A: found {} valid passwords out of {}", results_a, _vec_len);
+        } else {
+            println!("part A: found no valid passwords!");
+        }
+
+        let results_b = part_b(_vec2);
+        if results_b > 0 {
+            println!("part B: found {} valid passwords out of {}", results_b, _vec_len);
+        } else {
+            println!("part B: found no valid passwords!");
+        }
     }
 
     Ok(())
